@@ -2,50 +2,39 @@ let readlineSync = require("readline-sync");
 
 let ListaDeTareas = [];
 
-function AgregarTareas () {
-    return new Promise((resolve, reject) => {
-        let Indicador = readlineSync.question("Ingrese el indicador de la tarea");
-        let Descripcion = readlineSync.question("Ingrese la descripción de la tarea");
-    
-        ListaDeTareas.push({
-            Indicador,
-            Descripcion,
-            completed: false
-        });
+async function AgregarTarea() {
+    let Indicador = readlineSync.question("Ingrese el indicador de la tarea");
+    let Descripcion = readlineSync.question("Ingrese la descripción de la tarea");
 
-        console.log("Tarea agregada exitosamente");
-        resolve();
+    ListaDeTareas.push({
+        Indicador,
+        Descripcion,
+        completed: false
     });
+
+    console.log("Tarea agregada exitosamente");
 }
 
-function EliminarTarea() {
-    return new Promise((resolve, reject) => {
-        let Indice = readlineSync.question("Ingrese el índice de la tarea a eliminar");
+async function EliminarTarea() {
+    let Indice = readlineSync.question("Ingrese el índice de la tarea a eliminar");
 
-        if (Indice >= 0 && Indice < ListaDeTareas.length) {
-            ListaDeTareas.splice(Indice, 1);
-            console.log("Tarea eliminada");
-            resolve();
-        } else {
-            console.log("Índice no existe");
-            reject("Índice no existe");
-        }
-    });
+    if (Indice >= 0 && Indice < ListaDeTareas.length) {
+        ListaDeTareas.splice(Indice, 1);
+        console.log("Tarea eliminada");
+    } else {
+        console.log("Índice no existe");
+    }
 }
 
-function CompletarTarea() {
-    return new Promise((resolve, reject) => {
-        let Indice = readlineSync.question("Ingrese el índice de la tarea a completar");
+async function CompletarTarea() {
+    let Indice = readlineSync.question("Ingrese el índice de la tarea a completar");
 
-        if (Indice >= 0 && Indice < ListaDeTareas.length) {
-            ListaDeTareas[Indice].completed = true;
-            console.log("Tarea completada con éxito");
-            resolve();
-        } else {
-            console.log("Índice inválido!");
-            reject("Índice inválido");
-        }
-    });
+    if (Indice >= 0 && Indice < ListaDeTareas.length) {
+        ListaDeTareas[Indice].completed = true;
+        console.log("Tarea completada con éxito");
+    } else {
+        console.log("Índice inválido");
+    }
 }
 
 function ImprimirLista() {
@@ -56,7 +45,7 @@ function ImprimirLista() {
     });
 }
 
-function correrPrograma () {
+async function correrPrograma() {
     while (true) {
         console.log("Elige una opción");
         console.log("");
@@ -66,23 +55,17 @@ function correrPrograma () {
         console.log("4. Imprimir la lista de tareas");
         console.log("5. Salir");
 
-        const opcion = readlineSync.question("Ingrese una opción");
+        const opcion = readlineSync.question("Ingrese una opcion");
 
         switch (opcion) {
             case "1":
-                AgregarTareas().then(() => {
-                    // Continuar con el bucle
-                });
+                await AgregarTarea();
                 break;
             case "2":
-                EliminarTarea().then(() => {
-                    // Continuar con el bucle
-                });
+                await EliminarTarea();
                 break;
             case "3":
-                CompletarTarea().then(() => {
-                    // Continuar con el bucle
-                });
+                await CompletarTarea();
                 break;
             case "4":
                 ImprimirLista();
