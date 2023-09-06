@@ -3,37 +3,40 @@ let readlineSync = require("readline-sync");
 let ListaDeTareas = [];
 
 async function AgregarTarea() {
-    let Indicador = readlineSync.question("Ingrese el indicador de la tarea");
-    let Descripcion = readlineSync.question("Ingrese la descripción de la tarea");
+    let Indicador = readlineSync.question("Ingrese el indicador de la tarea: ");
+    let Descripcion = readlineSync.question("Ingrese la descripcion de la tarea: ");
 
+    if  (Indicador === "" && Descripcion === ""){
+        console.log("No se puede agregar una tarea sin indicador no descripcion")
+    }  else {
     ListaDeTareas.push({
         Indicador,
         Descripcion,
         completed: false
-    });
-
+    })
     console.log("Tarea agregada exitosamente");
+    };
 }
 
 async function EliminarTarea() {
-    let Indice = readlineSync.question("Ingrese el índice de la tarea a eliminar");
+    let Indice = readlineSync.question("Ingrese el Indice de la tarea a eliminar: ");
 
     if (Indice >= 0 && Indice < ListaDeTareas.length) {
         ListaDeTareas.splice(Indice, 1);
         console.log("Tarea eliminada");
     } else {
-        console.log("Índice no existe");
+        console.log("Indice no existe");
     }
 }
 
 async function CompletarTarea() {
-    let Indice = readlineSync.question("Ingrese el índice de la tarea a completar");
+    let Indice = readlineSync.question("Ingrese el Indice de la tarea a completar: ");
 
     if (Indice >= 0 && Indice < ListaDeTareas.length) {
-        ListaDeTareas[Indice].completed = true;
-        console.log("Tarea completada con éxito");
+        ListaDeTareas[Indice].completed = !ListaDeTareas[Indice].completed;
+        console.log("Tarea completada con exito");
     } else {
-        console.log("Índice inválido");
+        console.log("Indice inválido");
     }
 }
 
@@ -55,7 +58,7 @@ async function correrPrograma() {
         console.log("4. Imprimir la lista de tareas");
         console.log("5. Salir");
 
-        const opcion = readlineSync.question("Ingrese una opcion");
+        const opcion = readlineSync.question("Ingrese una opcion: ");
 
         switch (opcion) {
             case "1":
