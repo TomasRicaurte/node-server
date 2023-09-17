@@ -3,25 +3,27 @@ const listViewRouter = express.Router();
 
 const ListaDeTareas = require('./ListadeTareas');
 
-listViewRouter.get('/completas', (req, res) => {
-    if (Array.isArray(ListaDeTareas)) {
-      const tareasCompletas = ListaDeTareas.filter(tarea => tarea.completed);
+listViewRouter.param('estado', (req, res, next, estado) => {
+  if (estado === 'completas' || estado === 'incompletas') {
+    req.estadoTarea = estado;
+    next();
+  } else {
+    res.status(400).json({ error: 'Estado de tarea no válido' });
+  }
+});
+
+listViewRouter.get('/:estado', (req, res) => {
+  if (Array.isArray(ListaDeTareas)) {
+    if (req.estadoTarea === 'completas') {
+      const tareasCompletas = ListaDeTareas.filter(tarea => tarea.completed === true);
       res.json(tareasCompletas);
-    } else {
-      res.status(500).json({ error: 'ListaDeTareas no es un array' });
-    }
-  });
-  
-  
-  listViewRouter.get('/incompletas', (req, res) => {
-    if (Array.isArray(ListaDeTareas)) {
-      const tareasIncompletas = ListaDeTareas.filter(tarea => !tarea.completed);
+    } else if (req.estadoTarea === 'incompletas') { // Aquí cambiamos de res a req
+      const tareasIncompletas = ListaDeTareas.filter(tarea => tarea.completed === false);
       res.json(tareasIncompletas);
-    } else {
-      res.status(500).json({ error: 'ListaDeTareas no es un array' });
     }
-  });
-  
+  } else {
+    res.status(500).json({ error: 'ListadeTareas no es un Array' });
+  }
+});
 
 module.exports = listViewRouter;
-
