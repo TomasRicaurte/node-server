@@ -13,7 +13,5 @@ Las funcionalidades mas importantes o caracteristicas de esta lista de tareas so
 1. La funcionalidad para marcar y desmarcar una tarea.
 2. Actualizar todas las novedades que se tiene en las tareas creadas.
 3. NO añadir tareas las cuales no tengan ni descripción ni contenido de la tarea.
-
-Estas tres caracteristicas de la lista de tareas son de las más destacables que se tiene, esto aparte de la
-manera y legibilidad a la hora de verlo e interactuar con el mismo; haciendolo de las opciones más viables
-para todas las personas que lo quieran usar sin necesidad de tener los conocimientos tecnicos.
+4. Validaciones en todos los parametros y rutas ingresados para evitar errores.
+5. Evitar ingresar cualquier espacio en blanco o indefinido de manera equivocada.
