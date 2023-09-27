@@ -1,77 +1,89 @@
 const express = require('express');
 const app = express();
-const port = 3000
-const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
-
-dotenv.config()
+const port = 3000;
 
 app.use(express.json());
 
-const validarTokenJWT = (req, res, next) => {
-  const token = req.header('Authorization'); 
+let tareas = [
+  { id: 1, titulo: 'Tarea 1', descripcion: 'Prueba de tarea completa', completed: true },
+  { id: 2, titulo: 'Tarea 2', descripcion: 'Prueba de tarea incompleta', completed: false }
+];
 
-  if (!token) {
-    return res.status(401).json({error: 'Token de autorizacion faltante'})
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = decoded.user
-    next()
-  } catch (error) {
-    return res.status(401).json({error: 'Token de autorizacion invalido'})
-  }
-}
-
-const validacionMethodsHTTP = (req, res, next) => {
-  const validarMethods = ['GET', 'POST', 'PUT', 'DELETE']
-
-  if (!validarMethods.includes(req.method)) {
-    return res.status(405).json({error: "Metodo HTTP no valido"})
-  }
-  next()
-};
-
-app.use(validacionMethodsHTTP);
-
-const listViewRouter = require('./list-view-router');
-const listEditRouter = require('./list-edit-router');
-
-app.use('/list-view', listViewRouter);
-app.use('/list-edit', listEditRouter);
-
-app.post('/login', (req, res) => {
-  const { username, password } = req.body
-  const users = [
-    {username: 'Tomas_Ricaurte', password: '1234509876'},
-    {username: 'Juanito_Alimaña', password: '0987654321'}
-  ]
-
-  const user = users.find((u) => u.username === username && u.password === password)
-
-  if (!user) {
-    return res.status(401).json({error: 'Credenciales incorrectas'})
-  } 
-
-  const payload = {
-    user: {
-      username: user.username
-    }
-  }
-
-  jwt.sign(payload,  process.env.JWT_SECRET, {expiresIn: '1h'}, (err, token) => {
-    if (err) {
-      return res.status(500).json({error: 'Error al generar el token'})
-    }
-    res.json({token})
-  })
-})
-
-app.get('/ruta-protegida', validarTokenJWT, (req, res) => {
-  res.json({ mensaje: 'Ruta protegida alcanzada con éxito' });
+app.get('/tareas', (req, res) => {
+  res.json(tareas);
 });
 
+app.get('/tarea/:id', (req, res) => {
+  const tarea = tareas.find(t => t.id === parseInt(req.params.id));
+  if (!tarea) {
+    return res.status(404).json({ error: 'Tarea no encontrada' });
+  }
+  res.json(tarea);
+});
+
+app.get('/tareas/completas', (req, res) => {
+  const tareasCompletas = tareas.filter(t => t.completed);
+  res.json(tareasCompletas);
+});
+
+app.get('/tareas/incompletas', (req, res) => {
+  const tareasIncompletas = tareas.filter(t => !t.completed);
+  res.json(tareasIncompletas);
+});
+
+app.post('/tareas', (req, res) => {
+  const { id, titulo, descripcion } = req.body;
+
+  if (!id ||!titulo || !descripcion) {
+    return res.status(400).json({ error: 'El id, el título y la descripción son obligatorios.' });
+  }
+
+  const existingTask = tareas.find(task => task.titulo === titulo);
+  if (existingTask) {
+    return res.status(400).json({ error: 'No se puede repetir el mismo título para distintas tareas.' });
+  }
+
+  const nuevaTarea = {
+    id: tareas.length + 1,
+    titulo,
+    descripcion,
+    completed: false
+  };
+
+  tareas.push(nuevaTarea);
+  res.status(201).json({ mensaje: 'Tarea creada con éxito', tarea: nuevaTarea });
+});
+
+app.put('/tareas/:id', (req, res) => {
+  const tarea = tareas.find(t => t.id === parseInt(req.params.id));
+  if (!tarea) {
+    return res.status(404).json({ error: 'Tarea no encontrada' });
+  }
+
+  if (req.body.titulo) {
+    tarea.titulo = req.body.titulo;
+  }
+
+  if (req.body.descripcion) {
+    tarea.descripcion = req.body.descripcion;
+  }
+
+  if (req.body.completed !== undefined) {
+    tarea.completed = req.body.completed;
+  }
+
+  res.status(200).json({ mensaje: 'Tarea actualizada correctamente', tarea });
+});
+
+app.delete('/tareas/:id', (req, res) => {
+  const tareaIndex = tareas.findIndex(t => t.id === parseInt(req.params.id));
+  if (tareaIndex === -1) {
+    return res.status(404).json({ error: 'Tarea no encontrada' });
+  }
+
+  tareas.splice(tareaIndex, 1);
+  res.json({ mensaje: 'Tarea eliminada con éxito' });
+});
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto ${port}`);
